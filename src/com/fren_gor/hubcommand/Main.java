@@ -30,5 +30,8 @@ public class Main extends Plugin {
 				e.printStackTrace();
 			}
 		}
+		
+		ConfigManager.updateVersion();
+		
 	}
 }

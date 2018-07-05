@@ -2,6 +2,7 @@ package com.fren_gor.hubcommand;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
@@ -31,7 +32,12 @@ public class Hub extends Command {
 		}
 
 		ProxiedPlayer p = (ProxiedPlayer) sender;
-
+		
+		if(getDisabledServers().contains(p.getServer().getInfo().getName())){
+			p.sendMessage(new ComponentBuilder(getDisabledError()).color(ChatColor.RED).create());
+			return;
+		}
+		
 		String s = getHub();
 		if (s.equalsIgnoreCase("default")) {
 			ListenerInfo listener = p.getPendingConnection().getListener();
@@ -71,6 +77,32 @@ public class Hub extends Command {
 		}
 
 		return c.getString("alreadyInHub");
+
+	}
+	
+	private String getDisabledError() {
+		Configuration c = null;
+		try {
+			c = ConfigurationProvider.getProvider(YamlConfiguration.class)
+					.load(new File(Main.getInstance().getDataFolder(), "config.yml"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return c.getString("disabledServersError");
+
+	}
+	
+	private List<String> getDisabledServers() {
+		Configuration c = null;
+		try {
+			c = ConfigurationProvider.getProvider(YamlConfiguration.class)
+					.load(new File(Main.getInstance().getDataFolder(), "config.yml"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return c.getStringList("disabled-servers");
 
 	}
 
