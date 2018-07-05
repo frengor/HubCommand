@@ -1,2 +1,8 @@
 hub: 'default' # 'default' to use the default server in bungeecord config
-alreadyInHub: 'You are already connected to this server!'
+alreadyInHub: You are already connected to this server!
+disabledServersError: You can't do /hub here
+
+disabled-servers: []
+
+# Do not touch pls. Internal Use
+config-version: 2
