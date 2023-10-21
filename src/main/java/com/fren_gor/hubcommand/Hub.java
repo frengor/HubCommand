@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -22,22 +21,20 @@ public class Hub extends Command {
 		super("hub");
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void execute(CommandSender sender, String[] args) {
-
 		if (!(sender instanceof ProxiedPlayer)) {
 			sender.sendMessage(new TextComponent("You must be a player to do /hub"));
 			return;
 		}
 
 		ProxiedPlayer p = (ProxiedPlayer) sender;
-		
+
 		if(getDisabledServers().contains(p.getServer().getInfo().getName())){
 			p.sendMessage(new ComponentBuilder(getDisabledError()).color(ChatColor.RED).create());
 			return;
 		}
-		
+
 		String s = getHub();
 		if (s.equalsIgnoreCase("default")) {
 			ListenerInfo listener = p.getPendingConnection().getListener();
@@ -51,7 +48,7 @@ public class Hub extends Command {
 			return;
 		}
 
-		p.connect(BungeeCord.getInstance().getServerInfo(s));
+		p.connect(Main.getInstance().getProxy().getServerInfo(s));
 	}
 
 	private String getHub() {
@@ -79,7 +76,7 @@ public class Hub extends Command {
 		return c.getString("alreadyInHub");
 
 	}
-	
+
 	private String getDisabledError() {
 		Configuration c = null;
 		try {
@@ -92,7 +89,7 @@ public class Hub extends Command {
 		return c.getString("disabledServersError");
 
 	}
-	
+
 	private List<String> getDisabledServers() {
 		Configuration c = null;
 		try {
