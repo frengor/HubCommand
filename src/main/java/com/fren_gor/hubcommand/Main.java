@@ -6,8 +6,11 @@ import java.io.InputStream;
 import java.nio.file.Files;
 
 import net.md_5.bungee.api.plugin.Plugin;
+import org.bstats.bungeecord.Metrics;
 
 public class Main extends Plugin {
+
+	private static final int BSTATS_ID = 2826;
 
 	private static Main m;
 
@@ -32,6 +35,7 @@ public class Main extends Plugin {
 		}
 		
 		ConfigManager.updateVersion();
-		
+
+		Metrics metrics = new Metrics(this, BSTATS_ID);
 	}
 }
