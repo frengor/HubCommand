@@ -29,14 +29,22 @@ public class Hub extends Command {
             return;
         }
 
+        Configuration c;
+        try {
+            c = ConfigurationProvider.getProvider(YamlConfiguration.class)
+                    .load(new File(Main.getInstance().getDataFolder(), "config.yml"));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+
         ProxiedPlayer p = (ProxiedPlayer) sender;
 
-        if (getDisabledServers().contains(p.getServer().getInfo().getName())) {
-            p.sendMessage(new ComponentBuilder(getDisabledError()).color(ChatColor.RED).create());
+        if (getDisabledServers(c).contains(p.getServer().getInfo().getName())) {
+            p.sendMessage(new ComponentBuilder(getDisabledError(c)).color(ChatColor.RED).create());
             return;
         }
 
-        String s = getHub();
+        String s = getHub(c);
         if (s.equalsIgnoreCase("default")) {
             ListenerInfo listener = p.getPendingConnection().getListener();
 
@@ -45,63 +53,26 @@ public class Hub extends Command {
         }
 
         if (p.getServer().getInfo().getName().equals(s)) {
-            p.sendMessage(new ComponentBuilder(getError()).color(ChatColor.RED).create());
+            p.sendMessage(new ComponentBuilder(getError(c)).color(ChatColor.RED).create());
             return;
         }
 
         p.connect(Main.getInstance().getProxy().getServerInfo(s));
     }
 
-    private String getHub() {
-        Configuration c;
-        try {
-            c = ConfigurationProvider.getProvider(YamlConfiguration.class)
-                    .load(new File(Main.getInstance().getDataFolder(), "config.yml"));
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-
+    private String getHub(Configuration c) {
         return c.getString("hub");
-
     }
 
-    private String getError() {
-        Configuration c;
-        try {
-            c = ConfigurationProvider.getProvider(YamlConfiguration.class)
-                    .load(new File(Main.getInstance().getDataFolder(), "config.yml"));
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-
+    private String getError(Configuration c) {
         return c.getString("alreadyInHub");
-
     }
 
-    private String getDisabledError() {
-        Configuration c;
-        try {
-            c = ConfigurationProvider.getProvider(YamlConfiguration.class)
-                    .load(new File(Main.getInstance().getDataFolder(), "config.yml"));
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-
+    private String getDisabledError(Configuration c) {
         return c.getString("disabledServersError");
-
     }
 
-    private List<String> getDisabledServers() {
-        Configuration c;
-        try {
-            c = ConfigurationProvider.getProvider(YamlConfiguration.class)
-                    .load(new File(Main.getInstance().getDataFolder(), "config.yml"));
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-
+    private List<String> getDisabledServers(Configuration c) {
         return c.getStringList("disabled-servers");
-
     }
-
 }
