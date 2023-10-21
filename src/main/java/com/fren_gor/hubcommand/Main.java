@@ -40,6 +40,6 @@ public class Main extends Plugin {
 
         Metrics metrics = new Metrics(this, BSTATS_ID);
         metrics.addCustomChart(new SimplePie("requires_permission", () -> ConfigManager.needsPermission() ? "Yes" : "No"));
-        metrics.addCustomChart(new SimplePie("has_disabled_servers", () -> ConfigManager.needsPermission() ? "Yes" : "No"));
+        metrics.addCustomChart(new SimplePie("has_disabled_servers", () -> ConfigManager.hasDisabledServers() ? "Yes" : "No"));
     }
 }
