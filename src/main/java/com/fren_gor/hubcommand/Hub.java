@@ -18,8 +18,8 @@ import net.md_5.bungee.config.YamlConfiguration;
 
 public class Hub extends Command {
 
-    public Hub() {
-        super("hub");
+    public Hub(boolean needsPermission) {
+        super("hub", needsPermission ? "hubcommand.command" : null);
     }
 
     @Override

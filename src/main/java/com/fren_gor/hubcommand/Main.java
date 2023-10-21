@@ -7,6 +7,7 @@ import java.nio.file.Files;
 
 import net.md_5.bungee.api.plugin.Plugin;
 import org.bstats.bungeecord.Metrics;
+import org.bstats.charts.SimplePie;
 
 public class Main extends Plugin {
 
@@ -23,7 +24,6 @@ public class Main extends Plugin {
         m = this;
         if (!getDataFolder().exists())
             getDataFolder().mkdirs();
-        getProxy().getPluginManager().registerCommand(this, new Hub());
         File file = new File(getDataFolder(), "config.yml");
 
         if (!file.exists()) {
@@ -36,6 +36,10 @@ public class Main extends Plugin {
 
         ConfigManager.updateVersion();
 
+        getProxy().getPluginManager().registerCommand(this, new Hub(ConfigManager.needsPermission()));
+
         Metrics metrics = new Metrics(this, BSTATS_ID);
+        metrics.addCustomChart(new SimplePie("requires_permission", () -> ConfigManager.needsPermission() ? "Yes" : "No"));
+        metrics.addCustomChart(new SimplePie("has_disabled_servers", () -> ConfigManager.needsPermission() ? "Yes" : "No"));
     }
 }

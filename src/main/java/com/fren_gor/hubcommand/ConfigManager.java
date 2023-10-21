@@ -13,7 +13,7 @@ import net.md_5.bungee.config.YamlConfiguration;
 
 public class ConfigManager {
 
-    private static final int version = 2;
+    private static final int version = 3;
 
     public static void updateVersion() {
         Configuration c;
@@ -25,7 +25,7 @@ public class ConfigManager {
             return;
         }
 
-        int v = 1;
+        int v = 1; // Default version 1
 
         if (c.contains("config-version")) {
             v = c.getInt("config-version");
@@ -72,5 +72,31 @@ public class ConfigManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static boolean needsPermission() {
+        Configuration c;
+        try {
+            c = ConfigurationProvider.getProvider(YamlConfiguration.class)
+                    .load(new File(Main.getInstance().getDataFolder(), "config.yml"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return c.getBoolean("requiresPermission");
+    }
+
+    public static boolean hasDisabledServers() {
+        Configuration c;
+        try {
+            c = ConfigurationProvider.getProvider(YamlConfiguration.class)
+                    .load(new File(Main.getInstance().getDataFolder(), "config.yml"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return !c.getList("disabled-servers").isEmpty();
     }
 }
