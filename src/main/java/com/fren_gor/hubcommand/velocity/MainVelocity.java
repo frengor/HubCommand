@@ -23,7 +23,7 @@ import java.nio.file.Path;
         authors = {"fren_gor"})
 public class MainVelocity {
 
-    private static final int BSTATS_ID = 2826;
+    private static final int BSTATS_ID = 26711;
 
     private final ProxyServer server;
     private final Logger logger;
