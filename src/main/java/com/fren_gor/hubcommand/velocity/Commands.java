@@ -9,6 +9,7 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -21,7 +22,11 @@ public class Commands {
         if (main.getConfigManager().needsPermission()) {
             cmd = cmd.requires(source -> source.hasPermission("hubcommand.command"));
         }
+
         final ConfigManager configManager = main.getConfigManager();
+        final Component disabledServerMsg = MiniMessage.miniMessage().deserialize(configManager.getDisabledServerMsg()).colorIfAbsent(NamedTextColor.RED);
+        final Component alreadyInHubMsg = MiniMessage.miniMessage().deserialize(configManager.getAlreadyInHubMsg()).colorIfAbsent(NamedTextColor.RED);
+
         cmd = cmd.executes(context -> {
             if (!(context.getSource() instanceof Player)) {
                 context.getSource().sendMessage(Component.text("You must be a player to do /hub", NamedTextColor.RED));
@@ -32,7 +37,7 @@ public class Commands {
             String currentServer = p.getCurrentServer().map(s -> s.getServerInfo().getName()).orElse("");
 
             if (configManager.getDisabledServers().contains(currentServer)) {
-                p.sendMessage(Component.text(configManager.getDisabledServerMsg(), NamedTextColor.RED));
+                p.sendMessage(disabledServerMsg);
                 return Command.SINGLE_SUCCESS;
             }
 
@@ -51,7 +56,7 @@ public class Commands {
             }
 
             if (currentServer.equals(hub)) {
-                p.sendMessage(Component.text(configManager.getAlreadyInHubMsg(), NamedTextColor.RED));
+                p.sendMessage(alreadyInHubMsg);
                 return Command.SINGLE_SUCCESS;
             }
 

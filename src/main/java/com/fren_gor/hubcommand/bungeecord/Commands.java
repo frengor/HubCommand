@@ -24,7 +24,7 @@ public class Commands extends Command {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (!(sender instanceof ProxiedPlayer)) {
-            sender.sendMessage(new TextComponent("You must be a player to do /hub"));
+            sender.sendMessage(new ComponentBuilder("You must be a player to do /hub").color(ChatColor.RED).create());
             return;
         }
 
@@ -32,7 +32,7 @@ public class Commands extends Command {
         String currentServer = p.getServer().getInfo().getName();
 
         if (configManager.getDisabledServers().contains(currentServer)) {
-            p.sendMessage(new ComponentBuilder(configManager.getDisabledServerMsg()).color(ChatColor.RED).create());
+            p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + configManager.getDisabledServerMsg(), ChatColor.RED));
             return;
         }
 
@@ -44,7 +44,7 @@ public class Commands extends Command {
         }
 
         if (currentServer.equals(hub)) {
-            p.sendMessage(new ComponentBuilder(configManager.getAlreadyInHubMsg()).color(ChatColor.RED).create());
+            p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + configManager.getAlreadyInHubMsg(), ChatColor.RED));
             return;
         }
 
