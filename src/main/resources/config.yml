@@ -1,9 +1,9 @@
 hub: 'default' # 'default' to use the default server in bungeecord config
 alreadyInHub: You are already connected to this server!
-disabledServersError: You can't do /hub here
+disabledServersError: You cannot do /hub here
 requiresPermission: false # Set to true to require the permission 'hubcommand.command' for executing /hub
 
 disabled-servers: []
 
-# Do not touch pls. Internal Use
+# Do not touch!!!
 config-version: 3

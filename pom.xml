@@ -6,11 +6,11 @@
 
     <groupId>com.frengor</groupId>
     <artifactId>hubcommand</artifactId>
-    <version>1.2.0</version>
+    <version>1.3.0</version>
     <packaging>jar</packaging>
 
     <name>HubCommand</name>
-    <description>Simple /hub command for BungeeCord</description>
+    <description>Simple /hub command for BungeeCord and Velocity</description>
     <url>https://github.com/frengor/HubCommand</url>
     <inceptionYear>2018</inceptionYear>
 
@@ -41,7 +41,13 @@
     <repositories>
         <repository>
             <id>bungeecord-repo</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+        </repository>
+
+        <!-- Velocity repo -->
+        <repository>
+            <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
     </repositories>
 
@@ -50,7 +56,15 @@
         <dependency>
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>
-            <version>1.20-R0.1-SNAPSHOT</version>
+            <version>1.21-R0.4-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Velocity API -->
+        <dependency>
+            <groupId>com.velocitypowered</groupId>
+            <artifactId>velocity-api</artifactId>
+            <version>3.4.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
@@ -58,7 +72,14 @@
         <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bungeecord</artifactId>
-            <version>3.0.1</version>
+            <version>3.1.0</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-velocity</artifactId>
+            <version>3.1.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

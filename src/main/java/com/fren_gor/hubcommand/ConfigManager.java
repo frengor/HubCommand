@@ -1,102 +1,125 @@
 package com.fren_gor.hubcommand;
 
+import org.yaml.snakeyaml.Yaml;
+
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-
-import net.md_5.bungee.config.Configuration;
-import net.md_5.bungee.config.ConfigurationProvider;
-import net.md_5.bungee.config.YamlConfiguration;
+import java.util.Set;
 
 public class ConfigManager {
 
-    private static final int version = 3;
+    private static final int VERSION = 3;
 
-    public static void updateVersion() {
-        Configuration c;
+    private final File configFile;
+    private final Yaml configLoader = new Yaml();
+
+    private Map<String, Object> config = new HashMap<>();
+    private String hub, alreadyInHubMsg, disabledServerMsg;
+    private final Set<String> disabledServers = new HashSet<>();
+
+    public ConfigManager(File dataFolder) {
+        if (!dataFolder.exists()) {
+            dataFolder.mkdir();
+        }
+
+        this.configFile = new File(dataFolder, "config.yml");
         try {
-            c = ConfigurationProvider.getProvider(YamlConfiguration.class)
-                    .load(new File(Main.getInstance().getDataFolder(), "config.yml"));
+            copyConfig();
+            reloadConfig();
+            updateConfig();
         } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        int v = 1; // Default version 1
-
-        if (c.contains("config-version")) {
-            v = c.getInt("config-version");
-        }
-
-        if (v >= version) {
-            return;
-        }
-
-        Map<String, Object> m = new HashMap<>();
-
-        for (String s : c.getKeys()) {
-            if (!s.equals("config-version")) {
-                m.put(s, c.get(s));
-            }
-        }
-
-        new File(Main.getInstance().getDataFolder(), "config.yml").delete();
-
-        try (InputStream in = Main.getInstance().getResourceAsStream("config.yml")) {
-            Files.copy(in, new File(Main.getInstance().getDataFolder(), "config.yml").toPath());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        try {
-            c = ConfigurationProvider.getProvider(YamlConfiguration.class)
-                    .load(new File(Main.getInstance().getDataFolder(), "config.yml"));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        for (String s : c.getKeys()) {
-            if (m.containsKey(s)) {
-                c.set(s, m.get(s));
-            }
-        }
-
-        try {
-            ConfigurationProvider.getProvider(YamlConfiguration.class)
-                    .save(c, new File(Main.getInstance().getDataFolder(), "config.yml"));
-        } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Cannot load config.yml", e);
         }
     }
 
-    public static boolean needsPermission() {
-        Configuration c;
-        try {
-            c = ConfigurationProvider.getProvider(YamlConfiguration.class)
-                    .load(new File(Main.getInstance().getDataFolder(), "config.yml"));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
+    public void reloadConfig() throws IOException {
+        config = configLoader.load(Files.newInputStream(configFile.toPath()));
+        hub = (String) config.get("hub");
+        alreadyInHubMsg = (String) config.get("alreadyInHub");
+        disabledServerMsg = (String) config.get("disabledServersError");
+        disabledServers.clear();
+        for (Object o : (List<?>) config.get("disabled-servers")) {
+            disabledServers.add((String) o);
         }
-
-        return c.getBoolean("requiresPermission");
     }
 
-    public static boolean hasDisabledServers() {
-        Configuration c;
-        try {
-            c = ConfigurationProvider.getProvider(YamlConfiguration.class)
-                    .load(new File(Main.getInstance().getDataFolder(), "config.yml"));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
+    public void copyConfig() throws IOException {
+        if (!configFile.exists()) {
+            try (InputStream in = this.getClass().getClassLoader().getResourceAsStream("config.yml")) {
+                if (in == null) {
+                    throw new IOException("Couldn't find config.yml inside jar.");
+                }
+                Files.copy(in, configFile.toPath());
+            }
+        }
+    }
+
+    public void updateConfig() throws IOException {
+        int ver = 1; // Default version 1
+        if (config.containsKey("config-version")) {
+            Object v = config.get("config-version");
+            if (v instanceof Integer) {
+                ver = (int) v;
+            }
         }
 
-        return !c.getList("disabled-servers").isEmpty();
+        if (ver >= VERSION) {
+            return;
+        }
+
+        Map<String, Object> newConfig;
+        try (InputStream in = this.getClass().getClassLoader().getResourceAsStream("config.yml")) {
+            if (in == null) {
+                throw new IOException("Couldn't find config.yml inside jar.");
+            }
+            newConfig = configLoader.load(in);
+        }
+
+        config.remove("config-version");
+        for (String s : newConfig.keySet().toArray(new String[0])) {
+            if (config.containsKey(s)) {
+                newConfig.put(s, config.get(s));
+            }
+        }
+
+        if (configFile.exists()) {
+            configFile.delete();
+        }
+        try (FileWriter writer = new FileWriter(configFile)) {
+            configLoader.dump(newConfig, writer);
+        }
+        reloadConfig();
+    }
+
+    public boolean needsPermission() {
+        return (Boolean) config.get("requiresPermission");
+    }
+
+    public boolean hasDisabledServers() {
+        return !disabledServers.isEmpty();
+    }
+
+    public String getHub() {
+        return hub;
+    }
+
+    public String getAlreadyInHubMsg() {
+        return alreadyInHubMsg;
+    }
+
+    public String getDisabledServerMsg() {
+        return disabledServerMsg;
+    }
+
+    public Set<String> getDisabledServers() {
+        return disabledServers;
     }
 }
